@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html ng-app="Eggly"> 
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+        <title> RCI slurm Gen </title>
+    </head>
+    <body ng-controller="MainCtrl"> 
+        <div ncy-breadcrumb></div>
+        <div class="container-fluid">
+            <h1 class="text-center">Job Command Generator</h1>
+            <h3 class="text-center">Enter the information correctly into the space below, only fill out boxes that are needed.</h3>
+            <p>If you need more information on <strong>SLURM</strong> check out the documentation <a href="http://slurm.schedmd.com/">here</a></p>
+            <h4>Please choose the correct format before you begin</h4>
+        <select ng-model="myformat" ng-options="option.name for option in options" ng-model="form" >
+            <option value="">--select your format--</option>
+        </select> 
+        <div class="table"> 
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <strong>Parameters</strong>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2" style="padding:5px;">Queue Output: <h6> if none, choose default</h6></div>
+                <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <select ng-show="myformat.name ==='SLURM'" ng-model="queselect" ng-options="que.name for que in ques" ng-model="form" >
+                    <option value="">--Queue list--</option>
+                        </select> 
+                        <select ng-show="myformat.name ==='PBS'" ng-model="queselect" ng-options="que.name for que in pbsques" ng-model="form" >
+                    <option value="">--Queue list--</option>
+                        </select> 
+                </div>
+            </div>
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;">Number of Nodes</div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="5" name="nodes"  ng-model="numNodes" id="text1" placeholder="Node#" /></input>
+                        <span style="color:red" ng-show="numNodes>queselect.nodelim">
+                            <div class="alert alert-danger" role="alert"><b>ERROR:</b> current que node limit is {{queselect.nodelim}}
+                            </div>
+                        </span>
+                    </div>     
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;">Number of Cores</div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="5" name="cores" id="text1"  ng-model="numCores" placeholder="Core#"/>
+                            <span style="color:red" ng-show="myformat.name==='SLURM' && numCores>20 && queselect.name !=='smp'">
+                                <div class="alert alert-danger" role="alert">The core <b>limit</b> for SLURM jobs is currently 20
+                                </div>
+                            </span>
+                            <span style="color:red" ng-show="myformat.name==='SLURM' && numCores>60 && queselect.name ==='smp'">
+                                <div class="alert alert-danger" role="alert">The core <b>limit</b> for SLURM jobs is currently 60
+                                </div>
+                            </span>
+                            <span style="color:red" ng-show="myformat.name==='PBS' && numCores>16 && queselect.name ==='gen2'">
+                                <div class="alert alert-danger" role="alert">The core <b>limit</b> for this queue is currently 16</div>
+                            </span>
+                            <span style="color:red" ng-show="myformat.name==='PBS' && numCores>12 && queselect.name !=='gen2'">
+                                <div class="alert alert-danger" role="alert">The core <b>limit</b> for this queue is currently 12</div>
+                            </span>
+                            
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;" placeholder="Name">Job Name</div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="15" name="jbname" id="text1"  ng-model="name" placeholder="Example Title"/> 
+                    </div>
+                </div>          
+                 <div class="row">
+                    <div class="col-md-2" style="padding:5px;">Executable</div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="15" name="jbname" id="text1"  ng-model="execute" placeholder="Executable"/> 
+                    </div>
+                </div>     
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;"><em>Job</em> Output: <h6> Specify file name</h6></div>
+
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="15" ng-model="jout" name="outtrac" id="text1" placeholder="Output"/>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;"><em>Error</em> Output: <h6> Specify file name</h6></div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="15" name="errtrac" ng-model="eOut" id="text1" placeholder="File Out"/>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;">Job time</div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <label>Hour:
+                            <input type="number" size="4" ng-model="hr" name="text3" value="01" id="text1" />
+                        </label>
+                        <label>Min:
+                            <input type="number" size="4" ng-model="min" name="text3" value="02" id="text2" />
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;">Module load application <h6> Please specify the library</div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <div class="col-md-2" ng-show="myformat.name ==='SLURM'" ng-repeat="mod in slurmmodule"  >
+                            <button type="button" ng-click="addMod(mod.name)" class="btn btn-primary btn-block ">{{mod.name}}</button>
+                        </div>
+                        <div class="col-md-2" ng-show="myformat.name ==='PBS'" ng-repeat="mod in pbsmodule"  >
+                            <button  type="button" ng-click="addMod(mod.name)" class="btn btn-primary btn-block">{{mod.name}}</button>
+                        </div>
+                        <p class="row">
+                            <div class="cold-md-2"> Selected: 
+                            <p ng-show="modsselected.length>0"><em>If you make a mistake, press a red button to remove last in</em>
+                            </p>
+                                <p class="col-md-2" ng-repeat="cod in modsselected"><button type="button" ng-click="removeMod()" class="btn btn-danger btn-block">{{cod.mod}}</button>
+                                </p>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;">Choose Working Directory <h6> Specify Entire Pathing</h6></div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="25" name="errtrac" ng-model="wDirectory" id="text1" placeholder="~/example/home"/>
+                    </div>
+                </div>  
+                <div class="row">
+                    <div class="col-md-2" style="padding:5px;">Output name <h6> .out extension already included </h6></div>
+                    <div class="col-md-10" style="padding:5px;border-left:1px solid black;">
+                        <input type="text" size="25" name="errtrac" ng-model="outName" id="text1" placeholder="Output Title"/>
+                    </div>
+                </div>            
+        </div>
+        <h4>Current Format: {{myformat.name}}</h4>
+        <button ng-click="booltoggle=!booltoggle" ng-init="booltoggle=false"> Generate </button>
+        
+    <div ng-show="myformat.name === 'SLURM' && booltoggle===true">
+        <p ng-show="name.length>0">### Job Name</p>
+        <p ng-show="name.length > 0">#SBATCH SLURM_JOB_ID-{{name}}</p>
+        <p ng-show="jout.length>0 || eOut.length>0">### Output files</p> 
+        <p ng-show="jout.length > 0">#SBATCH --output={{jout}}.out</p> 
+        <p ng-show="eOut.length > 0">#SBATCH --error={{eOut}}.err</p>
+        <p ng-show="numNodes>0||numCores>0||que.length>0||que.length < 1||hr>0 || min>0">### Specify Resources
+        <p ng-show="numNodes>0">#SBATCH --nodes={{numNodes}} <span style="color:red" ng-show="numNodes>queselect.nodelim">ERROR: current que node limit is {{queselect.nodelim}}</span></p>
+        <p ng-show="numCores>0">#SBATCH --ntasks={{numCores}} <span style="color:red" ng-show="numCores>20 && queselect.name !=='smp'">The core limit for this queue is currently 20</span><span style="color:red" ng-show="numCores>60 && queselect.name === 'smp'">The core limit for this queue is currently 60</span></p>
+        <p>#SBATCH -q {{queselect.name}}</p> 
+        <p ng-show="hr>0 || min>0">--time=<span ng-show="hr<10">0</span>{{hr}}:<span ng-show="min<10">0</span>{{min}}</p>
+        <br> </br>
+        <p>source /share/apps/modules/3.2.10/init/sh</p>
+        <p ng-repeat="cod in modsselected">module load <span >  {{cod.mod}}</span></p>
+        <br></br>
+        <p ng-show="wDirectory.length>0">cd {{wDirectory}}</p> 
+        <br></br>
+        <p ng-show="numNodes >0 && numCores>0&&execute.length>0&&wDirectory.length>0">mpirun -np {{numNodes*numCores}} -machinefile $SLURM_NODELIST {{execute}} {{wDirectory}}> {{outName}}.out </p>
+    </div>
+    <div ng-show="myformat.name === 'PBS' && booltoggle===true">
+        <p ng-show="name.length>0">### Job Name</p>
+        <p ng-show="name.length>0">#PBS -N {{name}}</p>
+        <p ng-show="jout.length>0 || eOut.length>0">### Output files</p> 
+        <p ng-show="jout.length > 0">#PBS --o {{jout}}.out</p> 
+        <p ng-show="eOut.length > 0">#PBS --e {{eOut}}.err</p>
+        <br></br> 
+        <p ng-show="numNodes>0||numCores>0||que.length>0||que.length||hr>0 || min>0">### Specifiy Resources</p>
+        <p ng-show="numNodes>0">#PBS -l nodes={{numNodes}} <span ng-show="numCores>0"> ppn={{numCores}}</span></p>
+        <p style="color:red" ng-show="numNodes>queselect.nodelim">ERROR: current que node limit is {{queselect.nodelim}}</p>
+        <p style="color:red" ng-show="numCores>12 && queselect.name !=='gen2'"> The core limit for PBS jobs is currently 12</p>
+        <span style="color:red" ng-show="numCores>16 && queselect.name ==='gen2'"> The core <b>limit</b> for this queue is currently 16</span>
+        <p>#PBS -q {{queselect.name}}</p> 
+        <p ng-show="hr>0 || min>0 || sec>0">--walltime=<span ng-show="hr<10||hr<1">0</span>{{hr}}:<span ng-show="min<10||min<1">0</span>{{min}}</p>
+        <br></br> 
+        <p>source /share/apps/modules/3.2.10/init/sh</p>
+        <p ng-repeat="cod in modsselected">module load <span>  {{cod.mod}}</span></p>
+        <br></br>
+        <p ng-show="wDirectory.length>0">cd {{wDirectory}}</p> 
+        <br></br>
+        <p ng-show="numNodes >0 && numCores>0&&execute.length>0&&wDirectory.length>0">mpirun -np {{numNodes*numCores}} -machinefile $PBS_NODEFILE {{execute}} {{wDirectory}} > {{outName}}.out </p>
+        
+
+    </div>  
+        </div>
+    <br></br> 
+    <br></br> 
+    <br></br>      
+    <br></br> 
+    <br></br> 
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script> 
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> 
+        <script src="jc-app.start.js"></script> 
+    </body>
+</html>
